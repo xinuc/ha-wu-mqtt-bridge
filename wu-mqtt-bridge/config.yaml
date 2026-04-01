@@ -1,0 +1,38 @@
+name: "WU-MQTT Bridge"
+description: "Bridge Weather Underground weather stations to Home Assistant via MQTT"
+version: "0.1.0"
+slug: wu-mqtt-bridge
+url: "https://github.com/xinuc/ha-wu-mqtt-bridge"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+startup: application
+boot: auto
+init: false
+ports:
+  443/tcp: 443
+  80/tcp: 80
+ports_description:
+  443/tcp: "HTTPS listener for weather station data"
+  80/tcp: "HTTP listener for weather station data"
+services:
+  - mqtt:want
+options:
+  mqtt_host: ""
+  mqtt_port: 1883
+  mqtt_username: ""
+  mqtt_password: ""
+  wu_forward: true
+  log_level: "info"
+  stale_timeout: 300
+schema:
+  mqtt_host: "str?"
+  mqtt_port: "port"
+  mqtt_username: "str?"
+  mqtt_password: "password?"
+  wu_forward: bool
+  log_level: "list(debug|info|warning|error)"
+  stale_timeout: "int(60,3600)"
+stage: experimental

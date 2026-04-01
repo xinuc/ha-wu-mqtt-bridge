@@ -1,0 +1,33 @@
+configuration:
+  mqtt_host:
+    name: MQTT Host
+    description: >-
+      Leave empty to auto-discover from the Mosquitto add-on.
+  mqtt_port:
+    name: MQTT Port
+    description: >-
+      Only used when MQTT Host is set manually.
+  mqtt_username:
+    name: MQTT Username
+    description: >-
+      Leave empty to auto-discover from the Mosquitto add-on.
+  mqtt_password:
+    name: MQTT Password
+    description: >-
+      Leave empty to auto-discover from the Mosquitto add-on.
+  wu_forward:
+    name: Forward to Weather Underground
+    description: >-
+      Keep sending data to WU so cloud features (history, apps) still work.
+  log_level:
+    name: Log Level
+    description: >-
+      Set to debug to see all incoming weather data.
+  stale_timeout:
+    name: Station Timeout (seconds)
+    description: >-
+      Seconds with no data before marking a station as offline.
+
+network:
+  443/tcp: HTTPS listener for weather station data (RapidFire)
+  80/tcp: HTTP listener for weather station data (standard)

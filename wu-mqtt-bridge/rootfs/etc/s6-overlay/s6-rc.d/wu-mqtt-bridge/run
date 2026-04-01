@@ -1,0 +1,51 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Start the WU-MQTT Bridge service
+# ==============================================================================
+
+bashio::log.info "Starting WU-MQTT Bridge..."
+
+# MQTT: auto-discover from Mosquitto add-on, allow manual override
+MQTT_HOST=""
+MQTT_PORT=1883
+MQTT_USER=""
+MQTT_PASSWORD=""
+
+if bashio::services.available "mqtt"; then
+    MQTT_HOST="$(bashio::services mqtt "host")"
+    MQTT_PORT="$(bashio::services mqtt "port")"
+    MQTT_USER="$(bashio::services mqtt "username")"
+    MQTT_PASSWORD="$(bashio::services mqtt "password")"
+    bashio::log.info "MQTT auto-discovered: ${MQTT_HOST}:${MQTT_PORT}"
+fi
+
+# Manual MQTT config overrides auto-discovery only when mqtt_host is set
+if bashio::config.has_value 'mqtt_host'; then
+    MQTT_HOST="$(bashio::config 'mqtt_host')"
+    MQTT_PORT="$(bashio::config 'mqtt_port')"
+    bashio::log.info "MQTT manual config: ${MQTT_HOST}:${MQTT_PORT}"
+    if bashio::config.has_value 'mqtt_username'; then
+        MQTT_USER="$(bashio::config 'mqtt_username')"
+    fi
+    if bashio::config.has_value 'mqtt_password'; then
+        MQTT_PASSWORD="$(bashio::config 'mqtt_password')"
+    fi
+fi
+
+if [[ -z "${MQTT_HOST}" ]]; then
+    bashio::log.fatal \
+        "No MQTT broker found. Install the Mosquitto add-on or set MQTT Host in config."
+    exit 1
+fi
+
+export MQTT_HOST MQTT_PORT MQTT_USER MQTT_PASSWORD
+export WU_FORWARD="$(bashio::config 'wu_forward')"
+export LOG_LEVEL="$(bashio::config 'log_level')"
+export STALE_TIMEOUT="$(bashio::config 'stale_timeout')"
+
+bashio::log.info "MQTT: ${MQTT_HOST}:${MQTT_PORT}"
+bashio::log.info "WU Forward: ${WU_FORWARD}"
+bashio::log.info "Log level: ${LOG_LEVEL}"
+
+exec python3 /app/main.py
