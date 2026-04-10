@@ -123,8 +123,10 @@ async def main() -> None:
         task = asyncio.create_task(forwarder.forward(params))
         task.add_done_callback(_log_task_exception)
 
-        # Dedup: skip if we already processed this exact dateutc for this station
-        if dateutc and dateutc == last_dateutc.get(sid):
+        # Dedup: skip if we already processed this exact dateutc for this station.
+        # "now" is a valid WU value meaning "use server time" — not a real
+        # timestamp, so it must not be used for dedup.
+        if dateutc and dateutc != "now" and dateutc == last_dateutc.get(sid):
             logger.debug("Skipping duplicate for %s (dateutc=%s)", station_id, dateutc)
             return
 
